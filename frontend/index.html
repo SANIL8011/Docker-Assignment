@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>3-Tier App · FiftyFive DevOps</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0a0f;
+      --surface: #12121a;
+      --border: #1e1e2e;
+      --accent: #00ff88;
+      --accent2: #00cfff;
+      --warn: #ffaa00;
+      --danger: #ff4466;
+      --text: #e0e0f0;
+      --muted: #555570;
+      --font-mono: 'Share Tech Mono', monospace;
+      --font-display: 'Syne', sans-serif;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-mono);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0,255,136,0.015) 2px,
+        rgba(0,255,136,0.015) 4px
+      );
+      pointer-events: none;
+      z-index: 999;
+    }
+
+    header {
+      border-bottom: 1px solid var(--border);
+      padding: 1.5rem 2.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--surface);
+      animation: fadeDown 0.6s ease both;
+    }
+
+    .logo {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 1.3rem;
+      letter-spacing: -0.02em;
+    }
+    .logo span { color: var(--accent); }
+
+    .status-badge {
+      font-size: 0.75rem;
+      padding: 0.3rem 0.8rem;
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      animation: pulse 2.5s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    main {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 3rem 2rem;
+    }
+
+    .arch-section {
+      margin-bottom: 3rem;
+      animation: fadeUp 0.7s ease 0.1s both;
+    }
+
+    .section-label {
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+    }
+
+    .arch-flow {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      flex-wrap: wrap;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 1.5rem 2rem;
+    }
+
+    .arch-node {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+    }
+    .arch-node .label {
+      font-size: 0.65rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+    .arch-node .name {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 1rem;
+    }
+    .arch-node .port {
+      font-size: 0.7rem;
+      color: var(--accent2);
+    }
+
+    .arch-arrow {
+      padding: 0 1rem;
+      color: var(--accent);
+      font-size: 1.2rem;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      margin-bottom: 3rem;
+      animation: fadeUp 0.7s ease 0.2s both;
+    }
+
+    .card {
+      background: var(--surface);
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+      transition: background 0.2s;
+    }
+    .card:hover { background: #161622; }
+
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .card-icon {
+      font-size: 1.4rem;
+      line-height: 1;
+    }
+
+    .tier-badge {
+      font-size: 0.6rem;
+      padding: 0.2rem 0.5rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+    .tier-1 { border: 1px solid var(--accent2); color: var(--accent2); }
+    .tier-2 { border: 1px solid var(--accent); color: var(--accent); }
+    .tier-3 { border: 1px solid var(--warn); color: var(--warn); }
+
+    .card-title {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 1.05rem;
+    }
+
+    .card-meta {
+      font-size: 0.75rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+   
+    .api-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      animation: fadeUp 0.7s ease 0.3s both;
+    }
+
+    .api-panel-header {
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+    }
+
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); animation: pulse 2s infinite; }
+
+    .api-buttons {
+      display: flex;
+      gap: 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .api-btn {
+      padding: 0.9rem 1.5rem;
+      background: transparent;
+      border: none;
+      border-right: 1px solid var(--border);
+      color: var(--muted);
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.15s;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      letter-spacing: 0.05em;
+    }
+    .api-btn:hover { background: var(--bg); color: var(--text); }
+    .api-btn .method { color: var(--accent2); font-weight: bold; }
+
+    .api-response {
+      padding: 1.5rem;
+      min-height: 100px;
+      font-size: 0.82rem;
+      line-height: 1.7;
+      color: var(--muted);
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+
+    .resp-ok { color: var(--accent); }
+    .resp-err { color: var(--danger); }
+    .resp-loading { color: var(--warn); }
+
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 1.5rem 2.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.7rem;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+      animation: fadeUp 0.7s ease 0.4s both;
+    }
+
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo">FiftyFive<span>Tech</span> · DevOps Assessment</div>
+    <div class="status-badge">● Live</div>
+  </header>
+
+  <main>
+
+    <div class="arch-section">
+      <div class="section-label">// Architecture Flow</div>
+      <div class="arch-flow">
+        <div class="arch-node">
+          <span class="label">Client</span>
+          <span class="name">Browser</span>
+          <span class="port">:80</span>
+        </div>
+        <div class="arch-arrow">──▶</div>
+        <div class="arch-node">
+          <span class="label">Tier 1</span>
+          <span class="name">Nginx</span>
+          <span class="port">:80 /api → backend</span>
+        </div>
+        <div class="arch-arrow">──▶</div>
+        <div class="arch-node">
+          <span class="label">Tier 2</span>
+          <span class="name">Node.js API</span>
+          <span class="port">:3000</span>
+        </div>
+        <div class="arch-arrow">──▶</div>
+        <div class="arch-node">
+          <span class="label">Tier 3</span>
+          <span class="name">MySQL</span>
+          <span class="port">:3306</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="cards">
+      <div class="card">
+        <div class="card-top">
+          <span class="card-icon">🌐</span>
+          <span class="tier-badge tier-1">Tier 1</span>
+        </div>
+        <div class="card-title">Nginx Frontend</div>
+        <div class="card-meta">
+          Image: nginx:alpine<br>
+          Port: 80<br>
+          Role: Static HTML + Reverse Proxy<br>
+          Config: envsubst + .conf.template
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-top">
+          <span class="card-icon">⚙️</span>
+          <span class="tier-badge tier-2">Tier 2</span>
+        </div>
+        <div class="card-title">Node.js API</div>
+        <div class="card-meta">
+          Image: node:18-alpine<br>
+          Port: 3000<br>
+          Routes: GET / · GET /health<br>
+          Startup: wait-for-mysql.sh
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-top">
+          <span class="card-icon">🗄️</span>
+          <span class="tier-badge tier-3">Tier 3</span>
+        </div>
+        <div class="card-title">MySQL Database</div>
+        <div class="card-meta">
+          Image: mysql:8.0<br>
+          Port: 3306<br>
+          Volume: mysql_data (persistent)<br>
+          Health: mysqladmin ping
+        </div>
+      </div>
+    </div>
+
+    <div class="api-panel">
+      <div class="api-panel-header">
+        <div class="dot"></div>
+        API Test Console
+      </div>
+      <div class="api-buttons">
+        <button class="api-btn" onclick="testApi('/')">
+          <span class="method">GET</span> /api/
+        </button>
+        <button class="api-btn" onclick="testApi('/health')">
+          <span class="method">GET</span> /api/health
+        </button>
+      </div>
+      <div class="api-response" id="response">// Click a button above to test the API via Nginx proxy...</div>
+    </div>
+
+  </main>
+
+  <footer>
+    <span>Docker 3-Tier · FiftyFive Technologies · DevOps Intern Assessment</span>
+    <span id="ts"></span>
+  </footer>
+
+  <script>
+    document.getElementById('ts').textContent = new Date().toUTCString();
+
+    async function testApi(path) {
+      const el = document.getElementById('response');
+      el.className = 'api-response resp-loading';
+      el.textContent = '// Sending request to /api' + path + ' ...\n';
+
+      try {
+        const res = await fetch('/api' + path);
+        const data = await res.json();
+        el.className = 'api-response resp-ok';
+        el.textContent =
+          '// HTTP ' + res.status + ' ' + res.statusText + '\n' +
+          '// Path: /api' + path + '\n\n' +
+          JSON.stringify(data, null, 2);
+      } catch (err) {
+        el.className = 'api-response resp-err';
+        el.textContent = '// ERROR: ' + err.message + '\n// Check if backend is running.';
+      }
+    }
+  </script>
+
+</body>
+</html>
