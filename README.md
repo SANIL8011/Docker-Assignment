@@ -1,6 +1,6 @@
 # Docker 3-Tier Application — FiftyFive Technologies DevOps Intern Assessment
 
-A fully containerized 3-tier web application using **Nginx + Node.js + MySQL**, orchestrated with Docker Compose.
+A fully containerized 3-tier web application using **Nginx + Node.js + MySQL**, orchestrated with Docker Compose. Includes bonus features: **multi-stage builds** and **non-root USER** in both Dockerfiles.
 
 ---
 
@@ -199,12 +199,12 @@ docker restart mysql_db
 ```
 .
 ├── frontend/
-│   ├── Dockerfile               # Nginx Alpine image, runs envsubst at startup
+│   ├── Dockerfile               # Nginx Alpine — multi-stage build, non-root user, envsubst at startup
 │   ├── nginx.conf.template      # Nginx config with ${BACKEND_URL} placeholder
 │   └── index.html               # Static dashboard page with API test console
 │
 ├── backend/
-│   ├── Dockerfile               # Node.js Alpine image
+│   ├── Dockerfile               # Node.js Alpine — multi-stage build, non-root user
 │   ├── .dockerignore            # Excludes node_modules, .env, etc.
 │   ├── app.js                   # Express API — GET / and GET /health
 │   ├── package.json             # Dependencies: express, mysql2
@@ -226,3 +226,18 @@ docker restart mysql_db
 | Frontend | Nginx             | `nginx:alpine`    |
 | Backend  | Node.js + Express | `node:18-alpine`  |
 | Database | MySQL             | `mysql:8.0`       |
+
+---
+
+## ⭐ Bonus Features
+
+### Multi-stage Builds
+Both `frontend/Dockerfile` and `backend/Dockerfile` use multi-stage builds:
+- **Stage 1 (builder)**: Installs dependencies / prepares assets
+- **Stage 2 (runtime)**: Copies only what's needed from the builder — no build tools, no extra files in the final image. Results in smaller, cleaner images.
+
+### Non-root USER
+- **Backend**: Runs as the built-in `node` user (`USER node`)
+- **Frontend**: Runs as the built-in `nginx` user (`USER nginx`)
+
+Neither container runs as root, following Docker security best practices.
